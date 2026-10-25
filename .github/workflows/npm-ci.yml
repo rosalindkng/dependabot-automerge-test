@@ -1,0 +1,25 @@
+name: npm-ci
+
+# Stands in for the Dataform CI: installs from package-lock.json.
+# The job name `install` is the status check that branch protection requires.
+
+on:
+  pull_request:
+    paths:
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/npm-ci.yml"
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci

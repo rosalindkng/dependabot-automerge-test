@@ -1,0 +1,37 @@
+name: dependabot-auto-merge
+
+# Turns on auto-merge for Dependabot PRs that are patch or minor bumps.
+# GitHub merges the PR once the required check (install) passes.
+# Major bumps are left for a human.
+
+on:
+  pull_request:
+    paths:
+      - "package.json"
+      - "package-lock.json"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Show what Dependabot changed
+        run: |
+          echo "dependency: ${{ steps.metadata.outputs.dependency-names }}"
+          echo "update type: ${{ steps.metadata.outputs.update-type }}"
+
+      - name: Enable auto-merge for patch and minor bumps
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

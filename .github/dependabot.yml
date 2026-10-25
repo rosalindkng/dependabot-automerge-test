@@ -1,0 +1,9 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: daily
+    # Test only: propose new releases immediately
+    cooldown:
+      default-days: 0
